@@ -2,6 +2,9 @@
 import type { TresObject } from '@tresjs/core'
 import { useLoop } from '@tresjs/core'
 import { shallowRef } from 'vue'
+import ColorSwitchingLight from './ColorSwitchingLight.vue';
+import ColorSwitchPuzzle from './ColorSwitchPuzzle.vue';
+
 
 const { onBeforeRender } = useLoop()
 
@@ -16,23 +19,10 @@ onBeforeRender(({ elapsed }) => {
 </script>
 
 <template>
-  <TresPerspectiveCamera :position="[5, 5, 5]" :look-at="[0, 0, 0]" />
-  <TresAmbientLight
-    :intensity="0.5"
-    color="white"
-  />
-  <TresMesh
-    ref="boxRef"
-    :position="[0, 2, 0]"
-  >
-    <TresBoxGeometry :args="[1, 1, 1]" />
-    <TresMeshNormalMaterial />
-  </TresMesh>
-  <TresDirectionalLight
-    :position="[0, 2, 4]"
-    :intensity="1"
-    cast-shadow
-  />
+  <TresPerspectiveCamera :position="[0, 10, 4]" :look-at="[0, 0, 0]" />
+  <!-- <TresDirectionalLight :position="[-4,8,5]" color="red" :intensity="2" /> -->
+  <!-- <ColorSwitchingLight :pos_x="1" :pos_y="1" :pos_z="1" colorOn="yellow" colorOff="blue"/> -->
+  <ColorSwitchPuzzle puzzleSetup="1101" colorOn="yellow" colorOff="blue"/>
   <TresAxesHelper />
   <TresGridHelper :args="[10, 10]" />
 </template>
