@@ -21,8 +21,8 @@ onBeforeRender(({ elapsed }) => {
 <template>
   <TresPerspectiveCamera :position="[0, 10, 4]" :look-at="[0, 0, 0]" />
   <!-- <TresDirectionalLight :position="[-4,8,5]" color="red" :intensity="2" /> -->
-  <!-- <ColorSwitchingLight :pos_x="1" :pos_y="1" :pos_z="1" colorOn="yellow" colorOff="blue"/> -->
-  <ColorSwitchPuzzle puzzleSetup="1101" colorOn="yellow" colorOff="blue"/>
+  <!--<ColorSwitchingLight :pos_x="1" :pos_y="1" :pos_z="1" colorOn="yellow" colorOff="yellow"/>-->
+  <ColorSwitchPuzzle puzzleSetup="100010011" colorOn="yellow" colorOff="black"/>
   <TresAxesHelper />
   <TresGridHelper :args="[10, 10]" />
 </template>

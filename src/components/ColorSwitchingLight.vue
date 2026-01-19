@@ -29,15 +29,23 @@
         default: false,
     }
   });
+
+  const emit = defineEmits(['toggle']);
 </script>
 
 <template>
   <TresMesh
     :position="[pos_x, pos_y, pos_z]"
+    @click="emit('toggle')"
   >
     <TresBoxGeometry :args="[1, 1, 1]" />
     <TresMeshStandardMaterial />
     <!-- <TresDirectionalLight :position="[-4,8,5]" color="red" :intensity="2" /> -->
-    <TresDirectionalLight :position="[pos_x, pos_y, pos_z]" :intensity="1" cast-shadow color="blue"/>
+    <TresPointLight 
+      :position="[pos_x, pos_y, pos_z]" 
+      :intensity="isOn ? 4.8 : 4.2" 
+      cast-shadow 
+      :color = "isOn ? colorOn : colorOff"
+    />
   </TresMesh>
 </template>
