@@ -39,13 +39,28 @@
     @click="emit('toggle')"
   >
     <TresBoxGeometry :args="[1, 1, 1]" />
-    <TresMeshStandardMaterial />
+    <TresMeshStandardMaterial
+      :color="isOn ? colorOn : colorOff"
+      :emissive="isOn ? colorOn : colorOff"
+      :emissiveIntensity="1"
+      :metalness="0.2"
+      :roughness="0.8"
+    />
     <!-- <TresDirectionalLight :position="[-4,8,5]" color="red" :intensity="2" /> -->
-    <TresPointLight 
+    <!--<TresPointLight 
       :position="[pos_x, pos_y, pos_z]" 
-      :intensity="isOn ? 4.8 : 4.2" 
+      :intensity="isOn ? 10.8 : 0.4" 
       cast-shadow 
       :color = "isOn ? colorOn : colorOff"
-    />
+    />-->
+    <!--<TresRectAreaLight
+      :position="[pos_x, pos_y, pos_z]" 
+      :intensity="isOn ? 2.8 : 0.4" 
+      :width="1.0"
+      :height="1.0"
+      :look-at="[0, 0, 0]"
+      cast-shadow 
+      :color = "isOn ? colorOn : colorOff"
+    />-->
   </TresMesh>
 </template>

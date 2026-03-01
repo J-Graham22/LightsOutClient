@@ -65,12 +65,17 @@
 
     // toggle adjacent lights
     const dimNum = Math.sqrt(length);
-    const adjacentIndices = [
-      index - 1, // left
-      index + 1, // right
-      index - dimNum, // up
-      index + dimNum // down
-      ];
+    const adjacentIndices = [];
+
+      //check to make sure left light is not on the previous row
+      if (index - 1 % dimNum !== dimNum - 1) adjacentIndices.push(index - 1);
+      //check to make sure right light is not on the next row
+      if (index + 1 % dimNum !== 0) adjacentIndices.push(index + 1); 
+      //check to make sure up light is in bounds
+      if (index - dimNum >= 0) adjacentIndices.push(index - dimNum);
+      //check to make sure down light is in bounds
+      if (index + dimNum < length) adjacentIndices.push(index + dimNum);
+
       adjacentIndices.forEach((adjIndex) => {
         if (adjIndex >= 0 && adjIndex < length) {
           lights.value[adjIndex].isOn = !lights.value[adjIndex].isOn;
@@ -93,4 +98,13 @@
         :isOn="i.isOn"
         @toggle="toggleLight(index)"
     />
+
+    <EffectComposer>
+      <FffectBloom
+        :intensity="1.6"
+        :luminanceThreshold="0.2"
+        :luminanceSmoothing="0.9"
+        :radius="0.4"
+      />
+    </EffectComposer>
 </template>

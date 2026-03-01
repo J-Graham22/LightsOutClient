@@ -5,6 +5,8 @@
 
   import TheDonut from './TheDonut.vue';
 
+  import { EffectComposer,EffectBloom } from '@tresjs/post-processing';
+
   const donutRef = ref();
 
   const { onBeforeRender } = useLoop();
