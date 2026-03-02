@@ -2,6 +2,7 @@
 // No imports needed! TresJS components are available globally
   import { useLoop } from '@tresjs/core';
   import { ref } from 'vue';
+  import { BloomPmndrs, EffectComposerPmndrs } from '@tresjs/post-processing';
 
   const props = defineProps({
     pos_x: {
@@ -63,4 +64,15 @@
       :color = "isOn ? colorOn : colorOff"
     />-->
   </TresMesh>
+
+  <Suspense>
+    <EffectComposerPmndrs>
+      <BloomPmndrs
+        :intensity="1.6"
+        :luminanceThreshold="0.2"
+        :luminanceSmoothing="0.9"
+        :radius="0.4"
+      />
+    </EffectComposerPmndrs>
+  </Suspense>
 </template>

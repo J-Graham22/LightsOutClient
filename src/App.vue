@@ -12,7 +12,6 @@ import ColorSwitchingLight from './components/ColorSwitchingLight.vue';
     :physically-correct-lights="true"
     window-size
   >
-    <!--<FirstExperience/>-->
     <TheExperience/>
   </TresCanvas>
 </template>
