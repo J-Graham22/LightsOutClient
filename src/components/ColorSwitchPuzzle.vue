@@ -20,6 +20,7 @@
   });
   
 
+  console.log(props);
     // <li v-for="i in lights">
     //     <ColorSwitchingLight 
     //         :pos_x="{{ i.x }}" 
