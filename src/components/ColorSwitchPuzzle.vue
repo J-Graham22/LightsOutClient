@@ -102,7 +102,7 @@
   -->
     <ColorSwitchingLight
         v-for="(i, index) in lights"
-        :key="i.id"
+        :key="index"
         :pos_x="i.pos_x" 
         :pos_y="i.pos_y" 
         :pos_z="i.pos_z" 
