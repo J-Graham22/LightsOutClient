@@ -33,13 +33,13 @@
 
 <template>
   <TresMesh
-    :position="[pos_x, pos_y, pos_z]"
+    :position="[props.pos_x, props.pos_y, props.pos_z]"
     @click="emit('toggle')"
   >
     <TresBoxGeometry :args="[1, 1, 1]" />
     <TresMeshStandardMaterial
-      :color="isOn ? colorOn : colorOff"
-      :emissive="isOn ? colorOn : colorOff"
+      :color="props.isOn ? props.colorOn : props.colorOff"
+      :emissive="props.isOn ? props.colorOn : props.colorOff"
       :emissiveIntensity="1"
       :metalness="0.2"
       :roughness="0.8"
