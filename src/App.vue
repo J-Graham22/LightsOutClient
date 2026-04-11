@@ -29,12 +29,19 @@ const solveMathematically = () => {
 }
 
 const puzzleInput = ref('')
+const loading = ref(true)
 
 onMounted(async () => {
-  const data = await generatePuzzleInput(9)
-
-  puzzleInput.value = data
-
+  const data = await generatePuzzleInput(25)
+  // generatePuzzleInput already returns axios response.data (the response body)
+  if (typeof data === 'string') {
+    puzzleInput.value = data
+  } else if (data && typeof data === 'object' && 'data' in data) {
+    puzzleInput.value = String((data as { data: string }).data)
+  } else {
+    puzzleInput.value = ''
+  }
+  loading.value = false
 })
 </script>
 
@@ -49,7 +56,8 @@ onMounted(async () => {
       :physically-correct-lights="true"
       window-size
     >
-      <TheExperience v-if="puzzleInput" :puzzle-input="puzzleInput"/>
+      <div v-if="loading">Loading...</div>
+      <TheExperience v-else :puzzle-input="puzzleInput"/>
     </TresCanvas>
   </div>
 </template>
