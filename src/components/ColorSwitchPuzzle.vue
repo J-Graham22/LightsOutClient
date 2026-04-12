@@ -1,8 +1,20 @@
+<script lang="ts">
+export type PuzzleState = {
+  /** Per-cell: true = color "on", false = color "off" */
+  onStates: boolean[]
+  /** Same grid as `puzzleSetup`: `'1'` on, `'0'` off */
+  stringRep: string
+}
+</script>
+
 <script setup lang="ts">
 // No imports needed! TresJS components are available globally
-  import { useLoop } from '@tresjs/core';
-  import { ref } from 'vue';
+  import { onMounted, ref } from 'vue';
   import ColorSwitchingLight from './ColorSwitchingLight.vue';
+
+  const emit = defineEmits<{
+    puzzleStateChange: [state: PuzzleState]
+  }>()
 
   const props = defineProps({
     puzzleSetup: {
@@ -17,8 +29,7 @@
       type: String,
       required: true,
     }
-  });
-  
+  });  
 
   console.log(props);
     // <li v-for="i in lights">
@@ -36,17 +47,18 @@
   const dim = Math.sqrt(length);
 
   //const lights = ref([]);
-  const lights = ref<{
-    pos_x: Number,
-    pos_y: Number,
-    pos_z: Number,
-    isOn: Boolean
-  }[]>
-  ([]);
+  const lights = ref<
+    {
+      pos_x: number
+      pos_y: number
+      pos_z: number
+      isOn: boolean
+    }[]
+  >([])
 
-  for(let i = 0; i < length; i++) {
-    const x: Number = i % dim;
-    const y: Number = Math.floor(i / dim);
+  for (let i = 0; i < length; i++) {
+    const x = i % dim
+    const y = Math.floor(i / dim)
     console.log(`Index: ${i}, X: ${x}, Y: ${y}, Value: ${props.puzzleSetup[i]}`);
     lights.value.push({
       pos_x: x * 2 - (dim - 1),
@@ -57,6 +69,29 @@
   }
 
   console.log(lights.value);
+
+  const getCurrentStringRep = () => {
+    let strRep = "";
+
+    for(let i = 0; i < lights.value.length; i++) {
+      strRep += lights.value[i].isOn ? "1" : "0";
+    }
+    
+    return strRep;
+  }
+
+  const getPuzzleState = (): PuzzleState => ({
+    onStates: lights.value.map((l) => l.isOn),
+    stringRep: getCurrentStringRep(),
+  })
+
+  const notifyState = () => {
+    emit('puzzleStateChange', getPuzzleState())
+  }
+
+  onMounted(() => {
+    notifyState()
+  })
 
   const toggleLight = (index: number) => {
     console.log(`Toggling light at index: ${index}`);
@@ -87,6 +122,8 @@
           lights.value[adjIndex].isOn = !lights.value[adjIndex].isOn;
         }
       });
+
+    notifyState()
   }
 
 </script>

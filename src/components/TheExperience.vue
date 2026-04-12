@@ -4,6 +4,7 @@ import { useLoop } from '@tresjs/core'
 import { shallowRef } from 'vue'
 import { BloomPmndrs, EffectComposerPmndrs } from '@tresjs/post-processing';
 import ColorSwitchPuzzle from './ColorSwitchPuzzle.vue';
+import type { PuzzleState } from './ColorSwitchPuzzle.vue';
 
 const props = defineProps({
   puzzleInput: {
@@ -11,6 +12,10 @@ const props = defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits<{
+  puzzleStateChange: [state: PuzzleState]
+}>()
 
 const { onBeforeRender } = useLoop()
 
@@ -38,7 +43,12 @@ const colorOff: string = colorPairs[randomIndex][1];
 
 <template>
   <TresPerspectiveCamera :position="[0, 15, 4]" :look-at="[0, 0, 0]" />
-  <ColorSwitchPuzzle :puzzleSetup="puzzleInput" :colorOn="colorOn" :colorOff="colorOff"/>
+  <ColorSwitchPuzzle
+    :puzzleSetup="puzzleInput"
+    :colorOn="colorOn"
+    :colorOff="colorOff"
+    @puzzle-state-change="emit('puzzleStateChange', $event)"
+  />
   <TresAxesHelper />
   <TresGridHelper :args="[10, 10]" />
   <Suspense>

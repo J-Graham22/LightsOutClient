@@ -3,6 +3,7 @@ import { TresCanvas } from '@tresjs/core'
 import { onMounted, ref } from 'vue'
 import TheExperience from './components/TheExperience.vue'
 import WhiteButton from './components/WhiteButton.vue';
+import type { PuzzleState } from './components/ColorSwitchPuzzle.vue'
 import axios from 'axios';
 
 const api = axios.create({
@@ -20,19 +21,41 @@ const generatePuzzleInput = async (size: number) => {
   }
 }
 
-const solveBruteForce = () => {
-
+const solveBruteForce = async () => {
+  try {
+    const response = await api.get(`/solution/brute_force/${puzzleState.value?.stringRep}`);
+    console.log(response);
+    return response.data;
+  } catch (err) {
+    console.error('Failed to solve via brute force:', err);
+    return null;
+  }
 }
 
-const solveMathematically = () => {
-
+const solveMathematically = async () => {
+  try {
+    const response = await api.get(`/solution/matrix_multiplication/${puzzleState.value?.stringRep}`);
+    console.log(response);
+    return response.data;
+  } catch (err) {
+    console.error('Failed to solve via matrix multiplication:', err);
+    return null;
+  }
 }
 
 const puzzleInput = ref('')
 const loading = ref(true)
 
+/** Latest grid from `ColorSwitchPuzzle`: each index is on/off; `stringRep` matches API format */
+const puzzleState = ref<PuzzleState | null>(null)
+
+const onPuzzleStateChange = (state: PuzzleState) => {
+  puzzleState.value = state;
+  console.log(puzzleState);
+}
+
 onMounted(async () => {
-  const data = await generatePuzzleInput(25)
+  const data = await generatePuzzleInput(9)
   // generatePuzzleInput already returns axios response.data (the response body)
   if (typeof data === 'string') {
     puzzleInput.value = data
@@ -49,15 +72,19 @@ onMounted(async () => {
   <div class="relative w-screen h-screen">
     <h1 class="absolute top-4 left-1/2 z-10 -translate-x-1/2 text-center text-white">Lights Out!</h1>
     <div class="absolute bottom-4 left-0 right-0 z-10 flex justify-center gap-4">
-      <WhiteButton label="Solve Mathematically"/>
-      <WhiteButton label="Solve Brute Force"/>
+      <WhiteButton label="Solve Mathematically" :onClick="solveMathematically"/>
+      <WhiteButton label="Solve Brute Force" :onClick="solveBruteForce"/>
     </div>
     <TresCanvas
       :physically-correct-lights="true"
       window-size
     >
       <div v-if="loading">Loading...</div>
-      <TheExperience v-else :puzzle-input="puzzleInput"/>
+      <TheExperience
+        v-else
+        :puzzle-input="puzzleInput"
+        @puzzle-state-change="onPuzzleStateChange"
+      />
     </TresCanvas>
   </div>
 </template>

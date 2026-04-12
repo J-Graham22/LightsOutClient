@@ -29,6 +29,7 @@
   });
 
   const emit = defineEmits(['toggle']);
+
 </script>
 
 <template>
