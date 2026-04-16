@@ -9,7 +9,7 @@ export type PuzzleState = {
 
 <script setup lang="ts">
 // No imports needed! TresJS components are available globally
-  import { onMounted, ref } from 'vue';
+  import { ref, watch } from 'vue';
   import ColorSwitchingLight from './ColorSwitchingLight.vue';
 
   const emit = defineEmits<{
@@ -43,9 +43,6 @@ export type PuzzleState = {
     //     />
     // </li> 
 
-  const length = props.puzzleSetup.length;
-  const dim = Math.sqrt(length);
-
   //const lights = ref([]);
   const lights = ref<
     {
@@ -56,19 +53,32 @@ export type PuzzleState = {
     }[]
   >([])
 
-  for (let i = 0; i < length; i++) {
-    const x = i % dim
-    const y = Math.floor(i / dim)
-    console.log(`Index: ${i}, X: ${x}, Y: ${y}, Value: ${props.puzzleSetup[i]}`);
-    lights.value.push({
-      pos_x: x * 2 - (dim - 1),
-      pos_y: 1,
-      pos_z: y * 2 - (dim - 1),
-      isOn: props.puzzleSetup[i] === '1'
-    });
-  }
+  const rebuildLights = (puzzleSetup: string) => {
+    const length = puzzleSetup.length
+    const dim = Math.sqrt(length)
+    const newLights: {
+      pos_x: number
+      pos_y: number
+      pos_z: number
+      isOn: boolean
+    }[] = []
 
-  console.log(lights.value);
+    for (let i = 0; i < length; i++) {
+      const x = i % dim
+      const y = Math.floor(i / dim)
+      console.log(`Index: ${i}, X: ${x}, Y: ${y}, Value: ${puzzleSetup[i]}`)
+      newLights.push({
+        pos_x: x * 2 - (dim - 1),
+        pos_y: 1,
+        pos_z: y * 2 - (dim - 1),
+        isOn: puzzleSetup[i] === '1',
+      })
+    }
+
+    lights.value = newLights
+    console.log(lights.value)
+    notifyState()
+  }
 
   const getCurrentStringRep = () => {
     let strRep = "";
@@ -89,9 +99,13 @@ export type PuzzleState = {
     emit('puzzleStateChange', getPuzzleState())
   }
 
-  onMounted(() => {
-    notifyState()
-  })
+  watch(
+    () => props.puzzleSetup,
+    (nextPuzzleSetup) => {
+      rebuildLights(nextPuzzleSetup)
+    },
+    { immediate: true }
+  )
 
   const toggleLight = (index: number) => {
     console.log(`Toggling light at index: ${index}`);
@@ -100,6 +114,7 @@ export type PuzzleState = {
     lights.value[index].isOn = !lights.value[index].isOn;
 
     // toggle adjacent lights
+    const length = lights.value.length
     const dimNum = Math.sqrt(length);
     const adjacentIndices = [];
 
