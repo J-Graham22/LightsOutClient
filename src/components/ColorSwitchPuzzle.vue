@@ -1,9 +1,13 @@
 <script lang="ts">
 export type PuzzleState = {
+  onColor: string
+  offColor: string
   /** Per-cell: true = color "on", false = color "off" */
   onStates: boolean[]
+  showWireframeStates: boolean[]
   /** Same grid as `puzzleSetup`: `'1'` on, `'0'` off */
   stringRep: string
+  wireframeStringRep: string
 }
 </script>
 
@@ -11,6 +15,7 @@ export type PuzzleState = {
 // No imports needed! TresJS components are available globally
   import { ref, watch } from 'vue';
   import ColorSwitchingLight from './ColorSwitchingLight.vue';
+import { StringController } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 
   const emit = defineEmits<{
     puzzleStateChange: [state: PuzzleState]
@@ -18,6 +23,10 @@ export type PuzzleState = {
 
   const props = defineProps({
     puzzleSetup: {
+      type: String,
+      required: true,
+    },
+    wireframeSetup: {
       type: String,
       required: true,
     },
@@ -32,28 +41,17 @@ export type PuzzleState = {
   });  
 
   console.log(props);
-    // <li v-for="i in lights">
-    //     <ColorSwitchingLight 
-    //         :pos_x="{{ i.x }}" 
-    //         :pos_y="{{ i.y }}" 
-    //         :pos_z="{{ i.z }}" 
-    //         :colorOn="{{ props.colorOn }}" 
-    //         :colorOff="{{ props.colorOff }}" 
-    //         :isOn="{{ i.isOn }}"
-    //     />
-    // </li> 
-
-  //const lights = ref([]);
   const lights = ref<
     {
       pos_x: number
       pos_y: number
       pos_z: number
       isOn: boolean
+      wireframeOn: boolean
     }[]
   >([])
 
-  const rebuildLights = (puzzleSetup: string) => {
+  const rebuildLights = (puzzleSetup: string, wireframeSetup: string) => {
     const length = puzzleSetup.length
     const dim = Math.sqrt(length)
     const newLights: {
@@ -61,6 +59,7 @@ export type PuzzleState = {
       pos_y: number
       pos_z: number
       isOn: boolean
+      wireframeOn: boolean
     }[] = []
 
     for (let i = 0; i < length; i++) {
@@ -72,6 +71,7 @@ export type PuzzleState = {
         pos_y: 1,
         pos_z: y * 2 - (dim - 1),
         isOn: puzzleSetup[i] === '1',
+        wireframeOn: wireframeSetup[i] === '1'
       })
     }
 
@@ -90,9 +90,23 @@ export type PuzzleState = {
     return strRep;
   }
 
+  const getCurrentWireframeStringRep = () => {
+    let strRep = "";
+
+    for(let i = 0; i < lights.value.length; i++) {
+      strRep += lights.value[i].wireframeOn ? "1" : "0";
+    }
+    
+    return strRep;
+  }
+
   const getPuzzleState = (): PuzzleState => ({
+    onColor: props.colorOn,
+    offColor: props.colorOff,
     onStates: lights.value.map((l) => l.isOn),
     stringRep: getCurrentStringRep(),
+    showWireframeStates: lights.value.map((l) => l.wireframeOn),
+    wireframeStringRep: getCurrentWireframeStringRep()
   })
 
   const notifyState = () => {
@@ -100,9 +114,9 @@ export type PuzzleState = {
   }
 
   watch(
-    () => props.puzzleSetup,
-    (nextPuzzleSetup) => {
-      rebuildLights(nextPuzzleSetup)
+    [() => props.puzzleSetup, () => props.wireframeSetup],
+    ([nextPuzzleSetup, nextWireframeSetup]) => {
+      rebuildLights(nextPuzzleSetup, nextWireframeSetup)
     },
     { immediate: true }
   )
@@ -161,6 +175,7 @@ export type PuzzleState = {
         :colorOn="props.colorOn" 
         :colorOff="props.colorOff" 
         :isOn="i.isOn"
+        :showX="i.wireframeOn"
         @toggle="toggleLight(index)"
     />
 </template>

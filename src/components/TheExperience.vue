@@ -11,6 +11,18 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  wireframesInput: {
+    type: String,
+    required: true,
+  },
+  colorOn: {
+    type: String,
+    required: true,
+  },
+  colorOff: {
+    type: String,
+    required: true
+  }
 });
 
 const emit = defineEmits<{
@@ -27,26 +39,15 @@ onBeforeRender(({ elapsed }) => {
     boxRef.value.rotation.z = elapsed
   }
 })
-
-// ordered: On, Off
-const colorPairs: [string, string][] = [
-  ["#02c926", "#f90202"], //green, red 
-  ["#1e32ea", "#ea9f1e"], //blue, orange
-  ["#eef224", "#921ace"], //yellow, purple
-]
-
-const randomIndex: number = Math.floor(Math.random() * colorPairs.length)
-
-const colorOn: string = colorPairs[randomIndex][0];
-const colorOff: string = colorPairs[randomIndex][1];
 </script>
 
 <template>
   <TresPerspectiveCamera :position="[0, 15, 4]" :look-at="[0, 0, 0]" />
   <ColorSwitchPuzzle
     :puzzleSetup="puzzleInput"
-    :colorOn="colorOn"
-    :colorOff="colorOff"
+    :wireframe-setup="wireframesInput"
+    :colorOn="$props.colorOn"
+    :colorOff="$props.colorOff"
     @puzzle-state-change="emit('puzzleStateChange', $event)"
   />
   <TresAxesHelper />

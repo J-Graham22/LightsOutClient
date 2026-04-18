@@ -36,6 +36,12 @@ const solveMathematically = async () => {
   try {
     const response = await api.get(`/solution/matrix_multiplication/${puzzleState.value?.stringRep}`);
     console.log(response);
+    let rep: string = '';
+    for (let i = 0; i < response.data.length; i++) {
+      rep += response.data[i].toString();
+    }
+    console.log(rep);
+    updateWireframInput(rep);
     return response.data;
   } catch (err) {
     console.error('Failed to solve via matrix multiplication:', err);
@@ -44,6 +50,9 @@ const solveMathematically = async () => {
 }
 
 const puzzleInput = ref('')
+const wireframeInput = ref('')
+const onColor = ref('')
+const offColor = ref('')
 const loading = ref(true)
 const selectedPuzzleSize = ref(9)
 
@@ -66,14 +75,44 @@ const updatePuzzleInput = (data: unknown) => {
   }
 }
 
+const updateWireframInput = (input: string | null) => {
+  if (input == null) {
+    var empty = ''
+    for(let i = 0; i < puzzleInput.value.length; i++) {
+      empty += '0';
+    }
+    wireframeInput.value = empty;
+  } else {
+    wireframeInput.value = input; 
+  }
+}
+
+// ordered: On, Off
+const colorPairs: [string, string][] = [
+  ["#02c926", "#f90202"], //green, red 
+  ["#1e32ea", "#ea9f1e"], //blue, orange
+  ["#eef224", "#921ace"], //yellow, purple
+]
+
+const updateColors = () => {
+  const randomIndex: number = Math.floor(Math.random() * colorPairs.length)
+
+  onColor.value = colorPairs[randomIndex][0];
+  offColor.value = colorPairs[randomIndex][1];
+}
+
 const generateNewPuzzle = async () => {
   const data = await generatePuzzleInput(selectedPuzzleSize.value)
   updatePuzzleInput(data)
+  updateColors()
+  updateWireframInput(null)
 }
 
 onMounted(async () => {
   const data = await generatePuzzleInput(selectedPuzzleSize.value)
   updatePuzzleInput(data)
+  updateColors()
+  updateWireframInput(null)
   loading.value = false
 })
 </script>
@@ -110,6 +149,9 @@ onMounted(async () => {
       <TheExperience
         v-else
         :puzzle-input="puzzleInput"
+        :wireframes-input="wireframeInput"
+        :colorOn="onColor"
+        :colorOff="offColor"
         @puzzle-state-change="onPuzzleStateChange"
       />
     </TresCanvas>
