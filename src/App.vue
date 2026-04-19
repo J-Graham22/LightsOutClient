@@ -5,6 +5,7 @@ import TheExperience from './components/TheExperience.vue'
 import WhiteButton from './components/WhiteButton.vue';
 import type { PuzzleState } from './components/ColorSwitchPuzzle.vue'
 import axios from 'axios';
+import ColorCircle from './components/ColorCircle.vue';
 
 const api = axios.create({
   baseURL: "http://127.0.0.1:8000"
@@ -13,7 +14,6 @@ const api = axios.create({
 const generatePuzzleInput = async (size: number) => {
   try {
     const response = await api.get(`/puzzle/solvable/${size}`);
-    console.log(response);
     return response.data;
   } catch (err) {
     console.error('Failed to fetch puzzle input:', err);
@@ -23,28 +23,37 @@ const generatePuzzleInput = async (size: number) => {
 
 const solveBruteForce = async () => {
   try {
+    const numOfSolutions = 2 ** selectedPuzzleSize.value;
+    statusText.value = `Solving via brute force! Evaluating ${numOfSolutions} possible solutions...`;
+    const start = new Date(Date.now()).getTime();
+
     const response = await api.get(`/solution/brute_force/${puzzleState.value?.stringRep}`);
-    console.log(response);
+    const end = new Date(Date.now()).getTime();
+    let timeTaken = end - start;
+    updateWireframInput(response.data[0]);
+    statusText.value = `Finished solving via brute force in ${timeTaken / 1000} seconds! Found ${response.data.length} solutions. Using the first one to solve!`;
     return response.data;
   } catch (err) {
     console.error('Failed to solve via brute force:', err);
+    statusText.value = "Found some error while trying to solve via brute force...";
     return null;
   }
 }
 
 const solveMathematically = async () => {
   try {
+    statusText.value = "Solving via matrix multiplication!";
     const response = await api.get(`/solution/matrix_multiplication/${puzzleState.value?.stringRep}`);
-    console.log(response);
     let rep: string = '';
     for (let i = 0; i < response.data.length; i++) {
       rep += response.data[i].toString();
     }
-    console.log(rep);
     updateWireframInput(rep);
+    statusText.value = "Found a solution! Click the lights highlighted with wireframe to solve";
     return response.data;
   } catch (err) {
     console.error('Failed to solve via matrix multiplication:', err);
+    statusText.value = "This puzzle isn't able to be solved via matrix multiplication";
     return null;
   }
 }
@@ -55,13 +64,19 @@ const onColor = ref('')
 const offColor = ref('')
 const loading = ref(true)
 const selectedPuzzleSize = ref(9)
+const statusText = ref('')
 
 /** Latest grid from `ColorSwitchPuzzle`: each index is on/off; `stringRep` matches API format */
 const puzzleState = ref<PuzzleState | null>(null)
 
 const onPuzzleStateChange = (state: PuzzleState) => {
   puzzleState.value = state;
-  console.log(puzzleState);
+  updateWireframInput(puzzleState.value.wireframeStringRep)
+  updatePuzzleInput(puzzleState.value.stringRep)
+  if ([...puzzleState.value.stringRep].every(c => c == '1')) {
+    statusText.value = "Solved!"
+  }
+  // console.log(puzzleState);
 }
 
 const updatePuzzleInput = (data: unknown) => {
@@ -106,6 +121,7 @@ const generateNewPuzzle = async () => {
   updatePuzzleInput(data)
   updateColors()
   updateWireframInput(null)
+  statusText.value = '';
 }
 
 onMounted(async () => {
@@ -120,6 +136,13 @@ onMounted(async () => {
 <template>
   <div class="relative w-screen h-screen">
     <h1 class="absolute top-4 left-1/2 z-10 -translate-x-1/2 text-center text-white">Lights Out!</h1>
+    <div class="absolute top-10 left-1/2 z-10 -translate-x-1/2 text-center text-white">
+      <div class="flex items-center gap-2">
+        <h1>Target Color:</h1>
+        <ColorCircle :color="onColor" />
+      </div>
+    </div>
+    <h2 class="absolute top-18 left-1/2 z-10 -translate-x-1/2 text-center text-white">{{ statusText }}</h2>
     <div class="absolute bottom-4 left-0 right-0 z-10 flex justify-center gap-4">
       <WhiteButton label="Solve Mathematically" :onClick="solveMathematically"/>
       <WhiteButton label="Solve Brute Force" :onClick="solveBruteForce"/>

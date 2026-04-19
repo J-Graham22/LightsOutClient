@@ -40,7 +40,6 @@ import { StringController } from 'three/examples/jsm/libs/lil-gui.module.min.js'
     }
   });  
 
-  console.log(props);
   const lights = ref<
     {
       pos_x: number
@@ -65,7 +64,6 @@ import { StringController } from 'three/examples/jsm/libs/lil-gui.module.min.js'
     for (let i = 0; i < length; i++) {
       const x = i % dim
       const y = Math.floor(i / dim)
-      console.log(`Index: ${i}, X: ${x}, Y: ${y}, Value: ${puzzleSetup[i]}`)
       newLights.push({
         pos_x: x * 2 - (dim - 1),
         pos_y: 1,
@@ -76,7 +74,6 @@ import { StringController } from 'three/examples/jsm/libs/lil-gui.module.min.js'
     }
 
     lights.value = newLights
-    console.log(lights.value)
     notifyState()
   }
 
@@ -122,8 +119,6 @@ import { StringController } from 'three/examples/jsm/libs/lil-gui.module.min.js'
   )
 
   const toggleLight = (index: number) => {
-    console.log(`Toggling light at index: ${index}`);
-
     // toggle clicked light
     lights.value[index].isOn = !lights.value[index].isOn;
 
@@ -151,6 +146,14 @@ import { StringController } from 'three/examples/jsm/libs/lil-gui.module.min.js'
           lights.value[adjIndex].isOn = !lights.value[adjIndex].isOn;
         }
       });
+    
+    if (lights.value.some(obj => obj.wireframeOn == true)) {
+      if (lights.value[index].wireframeOn) {
+        lights.value[index].wireframeOn = false;
+      } else {
+        lights.value.forEach(x => x.wireframeOn = false);
+      }
+    }
 
     notifyState()
   }
