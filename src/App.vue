@@ -135,7 +135,7 @@ onMounted(async () => {
 
 <template>
   <div class="relative w-screen h-screen">
-    <h1 class="absolute top-4 left-1/2 z-10 -translate-x-1/2 text-center text-white">Lights Out!</h1>
+    <h1 class="absolute top-4 left-1/2 z-10 -translate-x-1/2 text-center text-white">Color Puzzle! (based on <a href="https://en.wikipedia.org/wiki/Lights_Out_(game)" target="blank">Lights Out</a>)</h1>
     <div class="absolute top-10 left-1/2 z-10 -translate-x-1/2 text-center text-white">
       <div class="flex items-center gap-2">
         <h1>Target Color:</h1>
